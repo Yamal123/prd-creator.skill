@@ -94,7 +94,7 @@ body{font-family:var(--font-body);color:var(--fg);background:var(--page-bg);line
 .tab-group-btn .arrow{font-size:10px;transition:transform .2s;opacity:.5}
 .tab-group.open .tab-group-btn .arrow{transform:rotate(180deg)}
 .tab-group-btn.has-active{color:var(--brand);font-weight:600}
-.tab-dropdown{display:none;position:absolute;top:100%;left:0;min-width:160px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:110;padding:4px;margin-top:2px}
+.tab-dropdown{display:none;position:fixed;min-width:160px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:110;padding:4px}
 .tab-group.open .tab-dropdown{display:block}
 .tab-dropdown-item{display:block;width:100%;padding:8px 14px;font-size:13px;font-family:var(--font-body);color:var(--muted);background:transparent;border:0;border-radius:6px;text-align:left;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
 .tab-dropdown-item:hover{color:#111;background:rgba(0,0,0,0.04)}
@@ -221,6 +221,23 @@ body{font-family:var(--font-body);color:var(--fg);background:var(--page-bg);line
 .cm-form-submit{background:var(--brand);color:#fff}
 .cm-form-cancel{background:var(--light-bg);color:var(--fg)}
 
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);cursor:zoom-out;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.4);cursor:grab}
+.lightbox img.dragging{cursor:grabbing}
+.lightbox .svg-wrap{background:#fff;border-radius:8px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,0.4);max-width:90vw;max-height:90vh;overflow:auto}
+.lightbox .svg-wrap svg{display:block;max-width:100%;height:auto}
+.lightbox-close{position:absolute;top:16px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;border:0;font-size:20px;cursor:pointer;display:grid;place-items:center;transition:background .2s}
+.lightbox-close:hover{background:rgba(255,255,255,0.3)}
+.lightbox-zoom-bar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);border-radius:20px;padding:6px 12px}
+.lightbox-zoom-bar button{width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,0.2);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.lightbox-zoom-bar button:hover{background:rgba(255,255,255,0.4)}
+.lightbox-zoom-bar span{color:#fff;font-size:12px;font-weight:500;min-width:36px;text-align:center}
+/* 内容区图片可点击提示 */
+.md-view img, .mermaid-rendered svg, .md-view svg{cursor:zoom-in;transition:opacity .15s}
+.md-view img:hover, .mermaid-rendered svg:hover{opacity:.85}
+
 /* Responsive */
 @media(max-width:1200px){.md-toc{display:none!important}}
 @media(max-width:768px){
@@ -274,6 +291,17 @@ body{font-family:var(--font-body);color:var(--fg);background:var(--page-bg);line
 <nav class="md-toc" id="md-toc"></nav>
 <input type="file" id="cm-image-input" accept="image/*" onchange="App.onCommentImage(event)">
 
+<div class="lightbox" id="lightbox" onclick="App.closeLightbox()">
+  <button class="lightbox-close" onclick="App.closeLightbox()">&times;</button>
+  <div class="lightbox-zoom-bar">
+    <button onclick="event.stopPropagation();App.zoomLightbox(-0.3)" title="缩小">−</button>
+    <span id="lightbox-scale">100%</span>
+    <button onclick="event.stopPropagation();App.zoomLightbox(0.3)" title="放大">+</button>
+    <button onclick="event.stopPropagation();App.zoomLightbox(0,'reset')" title="重置">1:1</button>
+  </div>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
 <script>
 const App = (function() {
   'use strict';
@@ -315,6 +343,38 @@ const App = (function() {
     // 下拉菜单点击代理 + 外部点击关闭
     document.getElementById('tab-bar-inner').addEventListener('click',function(e){var item=e.target.closest('.tab-dropdown-item');if(item){switchTab(item.dataset.tab);document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});}});
     document.addEventListener('click',function(e){if(!e.target.closest('.tab-group'))document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});});
+    // 图片/Mermaid/SVG 点击放大
+    document.getElementById('tab-container').addEventListener('click',function(e){
+      var target=e.target;
+      // 点击图片
+      if(target.tagName==='IMG'&&target.closest('.md-view')){
+        document.getElementById('lightbox-img').src=target.src;document.getElementById('lightbox').classList.add('open');return;
+      }
+      // 点击 Mermaid 渲染的 SVG — 转 data URL + 白底
+      var svg=target.closest('.mermaid-rendered svg')||(target.tagName==='svg'&&target.closest('.md-view')?target:null);
+      if(svg){
+        // 先包裹白底 SVG
+        var svgClone=svg.cloneNode(true);svgClone.removeAttribute('width');svgClone.removeAttribute('height');
+        var xmlns='http://www.w3.org/2000/svg';
+        var bgSvg=document.createElementNS(xmlns,'svg');bgSvg.setAttribute('xmlns',xmlns);
+        bgSvg.setAttribute('viewBox','0 0 '+svg.clientWidth+' '+svg.clientHeight);
+        bgSvg.setAttribute('width',svg.clientWidth);bgSvg.setAttribute('height',svg.clientHeight);
+        var r=document.createElementNS(xmlns,'rect');r.setAttribute('width','100%');r.setAttribute('height','100%');r.setAttribute('fill','white');
+        bgSvg.appendChild(r);bgSvg.appendChild(svgClone);
+        var s=new XMLSerializer().serializeToString(bgSvg);
+        var dataUri='data:image/svg+xml,'+encodeURIComponent(s);
+        var box=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');
+        img.src=dataUri;img.style.display='';box.classList.add('open');return;
+      }
+    });
+    // lightbox 关闭时清理 SVG clone
+    var lb=document.getElementById('lightbox');
+    lb.addEventListener('click',function(e){if(e.target===lb)closeLightbox();});
+    lb.addEventListener('wheel',function(e){if(e.target===lb||e.target.tagName==='IMG'){e.preventDefault();zoomLightbox(e.deltaY<0?0.2:-0.2);}});
+    var li=document.getElementById('lightbox-img');
+    li.addEventListener('mousedown',startPan);
+    document.addEventListener('mousemove',movePan);
+    document.addEventListener('mouseup',endPan);
     mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
     updateBadge();
   }
@@ -337,7 +397,7 @@ const App = (function() {
   /* ---- Scroll ---- */
   let tabBarOffsetTop=0,tocActiveTimer=null;
   function getScrollOffset(){const bar=document.getElementById('tab-bar');const h=bar?Math.ceil(bar.getBoundingClientRect().height):0;return h+20;}
-  function onScroll(){const bar=document.getElementById('tab-bar'),heroH=window.innerHeight;if(!tabBarOffsetTop)tabBarOffsetTop=bar.offsetTop;bar.classList.toggle('visible',window.scrollY>heroH*0.5);bar.classList.toggle('scrolled',window.scrollY>tabBarOffsetTop-10);updateTocVisibility();requestAnimationFrame(updateActiveToc);clearTimeout(tocActiveTimer);tocActiveTimer=setTimeout(updateActiveToc,90);updateTabFade();}
+  function onScroll(){const bar=document.getElementById('tab-bar'),heroH=window.innerHeight;if(!tabBarOffsetTop)tabBarOffsetTop=bar.offsetTop;bar.classList.toggle('visible',window.scrollY>heroH*0.5);bar.classList.toggle('scrolled',window.scrollY>tabBarOffsetTop-10);updateTocVisibility();requestAnimationFrame(updateActiveToc);clearTimeout(tocActiveTimer);tocActiveTimer=setTimeout(updateActiveToc,90);updateTabFade();document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});}
 
   /* Tab 栏横向滚动指示器 */
   function updateTabFade(){const inner=document.getElementById('tab-bar-inner');if(!inner)return;const bar=document.getElementById('tab-bar');const maxScroll=inner.scrollWidth-inner.clientWidth;bar.classList.toggle('can-scroll-left',inner.scrollLeft>4);bar.classList.toggle('can-scroll-right',inner.scrollLeft<maxScroll-4);}
@@ -366,7 +426,7 @@ const App = (function() {
   function updateActiveToc(){const toc=document.getElementById('md-toc');if(!toc)return;const headings=[...document.querySelectorAll('.tab-content.active .js-toc-content h1,.tab-content.active .js-toc-content h2,.tab-content.active .js-toc-content h3,.tab-content.active .js-toc-content .sec-title')];if(!headings.length)return;const readingLine=getScrollOffset()+90;let active=headings[0];headings.forEach(h=>{if(h.getBoundingClientRect().top<=readingLine)active=h;});toc.querySelectorAll('.is-active-link').forEach(a=>a.classList.remove('is-active-link'));toc.querySelectorAll('.is-active-li').forEach(li=>li.classList.remove('is-active-li'));const link=toc.querySelector(`a[href="#${CSS.escape(active.id)}"]`);if(link){link.classList.add('is-active-link');link.closest('.toc-list-item')?.classList.add('is-active-li');}}
 
   function switchTab(tabId){if(state.currentTab===tabId)return;closeCommentForm();state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-group-btn').forEach(function(b){var gid=b.closest('.tab-group');var children=allTabs.filter(function(t){return t.group&&gid&&gid.id==='tg-'+t.group;});b.classList.toggle('has-active',children.some(function(c){return c.id===tabId;}));});document.querySelectorAll('.tab-dropdown-item').forEach(function(d){d.classList.toggle('active',d.dataset.tab===tabId);});document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');const t=allTabs.find(x=>x.id===tabId);if(t&&state.content[tabId]!==undefined)renderTab(tabId,t.type);else if(t)loadContent(tabId,t.file,t.type);renderCommentList();updateBadge();scrollToTabTop();}
-  function toggleGroup(name){var el=document.getElementById('tg-'+name);if(!el)return;var wasOpen=el.classList.contains('open');document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});if(!wasOpen)el.classList.add('open');}
+  function toggleGroup(name){var el=document.getElementById('tg-'+name);if(!el)return;var wasOpen=el.classList.contains('open');document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});if(!wasOpen){el.classList.add('open');var btn=el.querySelector('.tab-group-btn');var rect=btn.getBoundingClientRect();var dd=el.querySelector('.tab-dropdown');dd.style.top=(rect.bottom+2)+'px';dd.style.left=rect.left+'px';}}
 
   function scrollToTabTop(){const bar=document.getElementById('tab-bar');if(bar){const top=bar.offsetTop;window.scrollTo({top:top,behavior:'auto'});}}
 
@@ -414,9 +474,44 @@ const App = (function() {
 
   function cancelComment(){closeCommentForm();}
 
+  function closeLightbox(){
+    var lb=document.getElementById('lightbox');lb.classList.remove('open');
+    var img=document.getElementById('lightbox-img');img.style.display='';img.style.transform='';img.style.transition='';
+    document.getElementById('lightbox-scale').textContent='100%';
+    _lightboxScale=1;_panX=0;_panY=0;
+  }
+
+  var _lightboxScale=1, _panX=0, _panY=0, _panning=false, _panStartX=0, _panStartY=0, _panOrigX=0, _panOrigY=0;
+  function zoomLightbox(delta,reset){
+    var img=document.getElementById('lightbox-img');
+    img.style.transition='transform .2s';
+    if(reset){_lightboxScale=1;_panX=0;_panY=0;}
+    else{_lightboxScale=Math.max(0.2,Math.min(5,_lightboxScale+delta));}
+    img.style.transform='translate('+_panX+'px,'+_panY+'px) scale('+_lightboxScale+')';
+    document.getElementById('lightbox-scale').textContent=Math.round(_lightboxScale*100)+'%';
+  }
+
+  function startPan(e){
+    if(_lightboxScale<=1)return;
+    _panning=true;_panStartX=e.clientX;_panStartY=e.clientY;_panOrigX=_panX;_panOrigY=_panY;
+    document.getElementById('lightbox-img').classList.add('dragging');
+    e.preventDefault();
+  }
+  function movePan(e){
+    if(!_panning)return;
+    _panX=_panOrigX+(e.clientX-_panStartX);_panY=_panOrigY+(e.clientY-_panStartY);
+    var img=document.getElementById('lightbox-img');
+    img.style.transition='none';
+    img.style.transform='translate('+_panX+'px,'+_panY+'px) scale('+_lightboxScale+')';
+  }
+  function endPan(){
+    _panning=false;
+    document.getElementById('lightbox-img').classList.remove('dragging');
+  }
+
   function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-  return {init,switchTab,toggleGroup,toggleComment,startComment,submitComment,cancelComment,editComment,deleteComment,clickComment,scrollToHeading,onCommentImage,removeImg,updateBadge};
+  return {init,switchTab,toggleGroup,closeLightbox,zoomLightbox,toggleComment,startComment,submitComment,cancelComment,editComment,deleteComment,clickComment,scrollToHeading,onCommentImage,removeImg,updateBadge};
 })();
 document.addEventListener('DOMContentLoaded',()=>App.init());
 </script>

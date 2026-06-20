@@ -152,3 +152,18 @@ cd prd/ && python3 manager/start.py
 ```
 
 访问 `/prd/`，后台 `/prd/manager/`。
+
+## 模板特性
+
+PRD 页面支持以下交互：
+
+| 特性 | 说明 | 配置方式 |
+|---|---|---|
+| 多级菜单 | `tabs.groups` 将多个 Tab 折叠为下拉菜单，避免 tab bar 过长 | config.json 的 `tabs.groups` |
+| 图片/Mermaid/SVG 放大 | 点击内容区图片或 Mermaid 图弹出 lightbox，支持缩放和拖动 | 无需配置，模板内置 |
+| 缩放控制 | lightbox 中滚轮缩放 + `−` `+` `1:1` 按钮 + 拖动平移 | 模板内置 |
+| 中文文件名 | Tab 文件名支持中文，server.py 自动 URL 解码 | 文件名需与 tabs.files 一致 |
+| 在线评论 | 段落级评论标注，Markdown 格式，图片上传，按 Tab 独立存储 | 模板内置 |
+| TOC 目录 | 自动读取 h1/h2/h3 生成侧边目录导航 | 模板内置 |
+| Mermaid 渲染 | 支持流程图、时序图、甘特图、ER 图等 | 模板内置（mermaid.js CDN） |
+| 后台管理 | 可视化编辑 config.json、管理 Tab 内容文件 | 访问 `/prd/manager/` |
