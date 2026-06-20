@@ -304,7 +304,7 @@ const App = (function() {
     const ld=document.getElementById('hero-logo');if(config.meta.logo&&config.meta.logo.value){if(config.meta.logo.type==='image')ld.innerHTML=`<img src="${config.meta.logo.value}" alt="logo">`;else ld.innerHTML=config.meta.logo.value;}
     const g=document.getElementById('hl-grid');g.innerHTML='';
     config.cards.forEach(c=>{const e=document.createElement('div');e.className='hl-card anim-in';e.innerHTML=`<div class="hl-icon ${c.icon}">${CARD_ICONS[c.icon]||CARD_ICONS.document}</div><h3>${esc(c.title)}</h3><div class="hl-card-desc">${marked.parse(c.description||'')}</div>`;g.appendChild(e);});
-    document.getElementById('page-footer').innerHTML=`&copy; ${new Date().getFullYear()} · <a href="/manager/" style="color:inherit;text-decoration:none;cursor:pointer" title="管理后台">${esc(config.footer.text)}</a>`;
+    document.getElementById('page-footer').innerHTML=`&copy; ${new Date().getFullYear()} · <a href="./manager/" style="color:inherit;text-decoration:none;cursor:pointer" title="管理后台">${esc(config.footer.text)}</a>`;
   }
   function setupAnimations(){if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;const o=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');o.unobserve(e.target);}});},{threshold:0.15});document.querySelectorAll('.anim-in').forEach((el,i)=>{el.style.transitionDelay=(i*0.06)+'s';o.observe(el);});}
 
