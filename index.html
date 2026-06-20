@@ -73,11 +73,34 @@ body{font-family:var(--font-body);color:var(--fg);background:var(--page-bg);line
 .tab-bar{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:6px 0;background:transparent;transition:background .3s ease,box-shadow .3s ease}
 .tab-bar.visible{background:rgba(255,255,255,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .tab-bar.scrolled{background:rgba(255,255,255,1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04)}
-.tab-bar-inner{display:flex;gap:2px;padding:4px 0}
+.tab-bar-inner{display:flex;gap:2px;padding:4px 0;max-width:calc(100vw - 64px);overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+/* 隐藏滚动条 */
+.tab-bar-inner::-webkit-scrollbar{display:none}
+.tab-bar-inner{scrollbar-width:none}
+/* 两侧渐隐提示 */
+.tab-bar::before,.tab-bar::after{content:'';position:absolute;top:0;bottom:0;width:24px;z-index:1;pointer-events:none;opacity:0;transition:opacity .3s}
+.tab-bar::before{left:0;background:linear-gradient(to right,rgba(255,255,255,0.9),transparent)}
+.tab-bar::after{right:0;background:linear-gradient(to left,rgba(255,255,255,0.9),transparent)}
+.tab-bar.can-scroll-left::before{opacity:1}
+.tab-bar.can-scroll-right::after{opacity:1}
 .tab-btn{position:relative;padding:9px 18px;font-size:14px;font-weight:500;font-family:var(--font-body);color:var(--muted);background:transparent;border:0;border-radius:var(--radius-btn);white-space:nowrap;cursor:pointer;transition:color .2s,background .2s}
 .tab-btn:hover{color:#111;background:rgba(0,0,0,0.04)}
 .tab-btn.active{color:var(--brand);font-weight:600}
 .tab-btn.active::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:20px;height:3px;border-radius:2px;background:var(--brand)}
+/* 分组下拉 */
+.tab-group{position:relative}
+.tab-group-btn{display:flex;align-items:center;gap:4px;position:relative;padding:9px 18px;font-size:14px;font-weight:500;font-family:var(--font-body);color:var(--muted);background:transparent;border:0;border-radius:var(--radius-btn);white-space:nowrap;cursor:pointer;transition:color .2s,background .2s}
+.tab-group-btn:hover{color:#111;background:rgba(0,0,0,0.04)}
+.tab-group-btn .arrow{font-size:10px;transition:transform .2s;opacity:.5}
+.tab-group.open .tab-group-btn .arrow{transform:rotate(180deg)}
+.tab-group-btn.has-active{color:var(--brand);font-weight:600}
+.tab-dropdown{display:none;position:absolute;top:100%;left:0;min-width:160px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:110;padding:4px;margin-top:2px}
+.tab-group.open .tab-dropdown{display:block}
+.tab-dropdown-item{display:block;width:100%;padding:8px 14px;font-size:13px;font-family:var(--font-body);color:var(--muted);background:transparent;border:0;border-radius:6px;text-align:left;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+.tab-dropdown-item:hover{color:#111;background:rgba(0,0,0,0.04)}
+.tab-dropdown-item.active{color:var(--brand);font-weight:600;background:var(--brand-light)}
+/* 响应式: 移动端下拉右对齐 */
+@media(max-width:768px){.tab-dropdown{right:0;left:auto}}
 
 /* Content */
 .container{max-width:1100px;margin:0 auto;padding:0 32px}
@@ -289,13 +312,16 @@ const App = (function() {
     window.addEventListener('scroll',onScroll,{passive:true});
     allTabs.forEach(t=>loadContent(t.id,t.file,t.type));
     setupAnimations();
+    // 下拉菜单点击代理 + 外部点击关闭
+    document.getElementById('tab-bar-inner').addEventListener('click',function(e){var item=e.target.closest('.tab-dropdown-item');if(item){switchTab(item.dataset.tab);document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});}});
+    document.addEventListener('click',function(e){if(!e.target.closest('.tab-group'))document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});});
     mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
     updateBadge();
   }
   async function loadConfig(){try{const r=await fetch('config.json');if(r.ok){config=deepMerge(DEFAULT_CONFIG,await r.json());return;}}catch(e){}config=JSON.parse(JSON.stringify(DEFAULT_CONFIG));}
   function deepMerge(b,o){const r=JSON.parse(JSON.stringify(b));for(const k in o){if(o[k]&&typeof o[k]==='object'&&!Array.isArray(o[k]))r[k]=deepMerge(b[k]||{},o[k]);else r[k]=o[k];}return r;}
   function applyBrand(){const s=document.documentElement.style;s.setProperty('--brand',config.brand.primary);s.setProperty('--brand-light',config.brand.light);s.setProperty('--brand-dark',config.brand.dark);}
-  function buildTabs(){allTabs=[];const tc=config.tabs||{};(tc.files||[]).forEach(item=>{const fp=typeof item==='string'?item:item.file;const p=fp.replace(/\\/g,'/').split('/'),fn=p[p.length-1],id=fn.replace(/\.(md|txt)$/,'');const label=typeof item==='string'?id.charAt(0).toUpperCase()+id.slice(1):(item.label||id);allTabs.push({id,label,file:fp,type:'markdown'});});(tc.extra||[]).forEach(t=>allTabs.push({id:t.id,label:t.label,file:t.file,type:t.type||'markdown'}));if(!allTabs.length)allTabs.push({id:'default',label:'内容',file:'content.md',type:'markdown'});}
+  function buildTabs(){allTabs=[];const tc=config.tabs||{};const groups=tc.groups||{};(tc.files||[]).forEach(item=>{const fp=typeof item==='string'?item:item.file;const p=fp.replace(/\\/g,'/').split('/'),fn=p[p.length-1],id=fn.replace(/\.(md|txt)$/,'');const label=typeof item==='string'?id.charAt(0).toUpperCase()+id.slice(1):(item.label||id);let grp=null;for(const g in groups){if((groups[g]||[]).includes(id)){grp=g;break;}}allTabs.push({id,label,file:fp,type:'markdown',group:grp});});(tc.extra||[]).forEach(t=>allTabs.push({id:t.id,label:t.label,file:t.file,type:t.type||'markdown',group:null}));if(!allTabs.length)allTabs.push({id:'default',label:'内容',file:'content.md',type:'markdown',group:null});}
 
   function renderHero(){
     document.getElementById('page-title').textContent=config.meta.title;document.getElementById('html-title').textContent=config.meta.title;
@@ -311,10 +337,14 @@ const App = (function() {
   /* ---- Scroll ---- */
   let tabBarOffsetTop=0,tocActiveTimer=null;
   function getScrollOffset(){const bar=document.getElementById('tab-bar');const h=bar?Math.ceil(bar.getBoundingClientRect().height):0;return h+20;}
-  function onScroll(){const bar=document.getElementById('tab-bar'),heroH=window.innerHeight;if(!tabBarOffsetTop)tabBarOffsetTop=bar.offsetTop;bar.classList.toggle('visible',window.scrollY>heroH*0.5);bar.classList.toggle('scrolled',window.scrollY>tabBarOffsetTop-10);updateTocVisibility();requestAnimationFrame(updateActiveToc);clearTimeout(tocActiveTimer);tocActiveTimer=setTimeout(updateActiveToc,90);}
+  function onScroll(){const bar=document.getElementById('tab-bar'),heroH=window.innerHeight;if(!tabBarOffsetTop)tabBarOffsetTop=bar.offsetTop;bar.classList.toggle('visible',window.scrollY>heroH*0.5);bar.classList.toggle('scrolled',window.scrollY>tabBarOffsetTop-10);updateTocVisibility();requestAnimationFrame(updateActiveToc);clearTimeout(tocActiveTimer);tocActiveTimer=setTimeout(updateActiveToc,90);updateTabFade();}
+
+  /* Tab 栏横向滚动指示器 */
+  function updateTabFade(){const inner=document.getElementById('tab-bar-inner');if(!inner)return;const bar=document.getElementById('tab-bar');const maxScroll=inner.scrollWidth-inner.clientWidth;bar.classList.toggle('can-scroll-left',inner.scrollLeft>4);bar.classList.toggle('can-scroll-right',inner.scrollLeft<maxScroll-4);}
+  document.addEventListener('DOMContentLoaded',()=>{const inner=document.getElementById('tab-bar-inner');if(inner)inner.addEventListener('scroll',updateTabFade,{passive:true});});
 
   /* ---- Tab ---- */
-  function renderTabBar(){document.getElementById('tab-bar-inner').innerHTML=allTabs.map(t=>`<button class="tab-btn" data-tab="${t.id}">${esc(t.label)}</button>`).join('');}
+  function renderTabBar(){var seen={},html='';allTabs.forEach(function(t){if(seen[t.id])return;seen[t.id]=true;if(!t.group){html+=`<button class="tab-btn" data-tab="${t.id}">${esc(t.label)}</button>`;return;}if(seen['__grp_'+t.group])return;seen['__grp_'+t.group]=true;var children=allTabs.filter(function(x){return x.group===t.group;});var childHtml=children.map(function(c){return`<button class="tab-dropdown-item" data-tab="${c.id}">${esc(c.label)}</button>`;}).join('');html+=`<div class="tab-group" id="tg-${t.group}"><button class="tab-group-btn" onclick="event.stopPropagation();App.toggleGroup('${t.group}')">${esc(t.group)} <span class="arrow">▾</span></button><div class="tab-dropdown">${childHtml}</div></div>`;});document.getElementById('tab-bar-inner').innerHTML=html;}
   function renderTabSections(){const c=document.getElementById('tab-container');c.innerHTML=allTabs.map(t=>t.type==='pages'?`<section class="tab-content" id="tab-${t.id}"><div id="view-${t.id}"></div></section>`:`<section class="tab-content" id="tab-${t.id}"><div class="md-view" id="view-${t.id}"></div></section>`).join('');}
   function activateTab(tabId){state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');}
 
@@ -335,7 +365,8 @@ const App = (function() {
   function updateTocVisibility(){const toc=document.getElementById('md-toc');const stuck=document.getElementById('tab-bar').classList.contains('scrolled');const hasContent=toc.querySelector('.toc-link')!==null;toc.style.setProperty('--toc-top',getScrollOffset()+20+'px');toc.classList.toggle('visible',stuck&&hasContent);}
   function updateActiveToc(){const toc=document.getElementById('md-toc');if(!toc)return;const headings=[...document.querySelectorAll('.tab-content.active .js-toc-content h1,.tab-content.active .js-toc-content h2,.tab-content.active .js-toc-content h3,.tab-content.active .js-toc-content .sec-title')];if(!headings.length)return;const readingLine=getScrollOffset()+90;let active=headings[0];headings.forEach(h=>{if(h.getBoundingClientRect().top<=readingLine)active=h;});toc.querySelectorAll('.is-active-link').forEach(a=>a.classList.remove('is-active-link'));toc.querySelectorAll('.is-active-li').forEach(li=>li.classList.remove('is-active-li'));const link=toc.querySelector(`a[href="#${CSS.escape(active.id)}"]`);if(link){link.classList.add('is-active-link');link.closest('.toc-list-item')?.classList.add('is-active-li');}}
 
-  function switchTab(tabId){if(state.currentTab===tabId)return;closeCommentForm();state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');const t=allTabs.find(x=>x.id===tabId);if(t&&state.content[tabId]!==undefined)renderTab(tabId,t.type);else if(t)loadContent(tabId,t.file,t.type);renderCommentList();updateBadge();scrollToTabTop();}
+  function switchTab(tabId){if(state.currentTab===tabId)return;closeCommentForm();state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-group-btn').forEach(function(b){var gid=b.closest('.tab-group');var children=allTabs.filter(function(t){return t.group&&gid&&gid.id==='tg-'+t.group;});b.classList.toggle('has-active',children.some(function(c){return c.id===tabId;}));});document.querySelectorAll('.tab-dropdown-item').forEach(function(d){d.classList.toggle('active',d.dataset.tab===tabId);});document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');const t=allTabs.find(x=>x.id===tabId);if(t&&state.content[tabId]!==undefined)renderTab(tabId,t.type);else if(t)loadContent(tabId,t.file,t.type);renderCommentList();updateBadge();scrollToTabTop();}
+  function toggleGroup(name){var el=document.getElementById('tg-'+name);if(!el)return;var wasOpen=el.classList.contains('open');document.querySelectorAll('.tab-group.open').forEach(function(g){g.classList.remove('open');});if(!wasOpen)el.classList.add('open');}
 
   function scrollToTabTop(){const bar=document.getElementById('tab-bar');if(bar){const top=bar.offsetTop;window.scrollTo({top:top,behavior:'auto'});}}
 
@@ -385,7 +416,7 @@ const App = (function() {
 
   function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-  return {init,switchTab,toggleComment,startComment,submitComment,cancelComment,editComment,deleteComment,clickComment,scrollToHeading,onCommentImage,removeImg,updateBadge};
+  return {init,switchTab,toggleGroup,toggleComment,startComment,submitComment,cancelComment,editComment,deleteComment,clickComment,scrollToHeading,onCommentImage,removeImg,updateBadge};
 })();
 document.addEventListener('DOMContentLoaded',()=>App.init());
 </script>

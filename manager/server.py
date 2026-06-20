@@ -37,7 +37,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         return urllib.parse.parse_qs(qs).get(name, [None])[0]
 
     def _serve_file(self, path):
-        fp = PRD_ROOT / path
+        fp = PRD_ROOT / urllib.parse.unquote(path)
         if not fp.exists():
             return self.send_error(404)
         ct = {".html":"text/html",".css":"text/css",".js":"application/javascript",".json":"application/json",".md":"text/markdown",".txt":"text/plain"}.get(fp.suffix, "application/octet-stream")
