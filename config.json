@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "产品需求介绍",
+    "subtitle": "本页面为产品需求文档模板，动态加载同目录下的 Markdown 文件，支持多 Tab 内容分区、目录导航和在线评论。",
+    "tags": ["v1.0", "产品需求", "动态内容", "Markdown"],
+    "logo": {
+      "type": "svg",
+      "value": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14 2 14 8 20 8\"/></svg>"
+    }
+  },
+  "brand": {
+    "primary": "#E31E24",
+    "light": "#FDEBEC",
+    "dark": "#B3151A"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "body": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "cards": [
+    { "icon": "document", "title": "文档即内容", "description": "页面自动加载同目录下的 Markdown 文件，修改文件即可更新页面内容。" },
+    { "icon": "sse", "title": "实时渲染", "description": "基于 marked.js + mermaid.js，支持 Markdown 全语法与流程图、时序图渲染。" },
+    { "icon": "knowledge", "title": "多 Tab 分区", "description": "Tab 标签页从文件夹自动扫描生成，每个 Tab 对应一个 Markdown 文件。" },
+    { "icon": "memory", "title": "在线评论", "description": "支持段落级评论标注，Markdown 格式，图片上传，按 Tab 独立存储。" },
+    { "icon": "human", "title": "后台管理", "description": "网页版可视化管理后台，编辑配置、内容和样式，一键保存即时生效。" },
+    { "icon": "evolve", "title": "响应式设计", "description": "适配桌面和移动端，目录导航、粘性 Tab 栏、毛玻璃过渡效果。" }
+  ],
+  "tabs": {
+    "folder": "tabs",
+    "files": ["tabs/page01.md", "tabs/page02.md", "tabs/page03.md"],
+    "extra": [
+      { "id": "product_intro", "label": "产品介绍", "type": "pages", "file": "pages.json" }
+    ]
+  },
+  "footer": { "text": "产品需求文档模板 · Powered by Markdown" }
+}

@@ -1,0 +1,18 @@
+{
+  "sections": [
+    {
+      "title": "用户端",
+      "cards": [
+        { "title": "首页", "description": "产品首页，展示核心功能和价值主张", "tags": ["核心"], "iconType": "chat", "link": "#" },
+        { "title": "帮助中心", "description": "常见问题和使用指南", "tags": ["自助"], "iconType": "kb", "link": "#" }
+      ]
+    },
+    {
+      "title": "管理后台",
+      "cards": [
+        { "title": "数据看板", "description": "核心指标可视化和实时监控", "tags": ["管理", "实时"], "iconType": "admin", "link": "#" },
+        { "title": "配置中心", "description": "系统参数和业务规则配置", "tags": ["管理"], "iconType": "ws", "link": "#" }
+      ]
+    }
+  ]
+}

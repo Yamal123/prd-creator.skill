@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="html-title">产品需求介绍</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/marked@12/marked.min.js"></script>
+<script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.32.2/tocbot.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.32.2/tocbot.min.js"></script>
+<style>
+:root {
+  --font-display:'Playfair Display',Georgia,serif;--font-body:'Inter',system-ui,-apple-system,sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --brand:#E31E24;--brand-light:#FDEBEC;--brand-dark:#B3151A;
+  --blue-bg:#dbeafe;--blue-fg:#2563eb;--green-bg:#dcfce7;--green-fg:#16a34a;
+  --amber-bg:#fef3c7;--amber-fg:#d97706;--purple-bg:#ede9fe;--purple-fg:#7c3aed;
+  --pink-bg:#fce7f3;--pink-fg:#db2777;
+  --page-bg:#eef0f4;--card-bg:#ffffff;--fg:#111;--muted:#6b7280;
+  --border:#e5e7eb;--light-bg:#f3f4f6;--lighter-bg:#f9fafb;
+  --radius-logo:24px;--radius-card:12px;--radius-icon:10px;--radius-tag:4px;--radius-btn:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--fg);background:var(--page-bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* Hero */
+.hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px 20px;text-align:center;background:linear-gradient(180deg,#fff 0%,#f8f9fc 40%,#eef0f4 100%);overflow:hidden}
+.hero-logo{width:80px;height:80px;flex-shrink:0;border-radius:var(--radius-logo);background:var(--brand);display:grid;place-items:center;margin:0 auto 24px;box-shadow:0 12px 40px rgba(227,30,36,0.25)}
+.hero-logo svg{width:40px;height:40px}
+.hero-logo img{width:40px;height:40px;border-radius:8px;object-fit:cover}
+.hero h1{font-family:var(--font-display);font-size:52px;font-weight:700;flex-shrink:0;letter-spacing:-0.02em;color:#111;margin-bottom:16px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hero-sub{font-size:18px;color:var(--muted);flex-shrink:0;max-width:640px;margin:0 auto 20px;line-height:1.7;max-height:3.6em;overflow:hidden}
+.hero .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;flex-shrink:0;margin-bottom:20px;max-height:36px;overflow:hidden}
+.hero .meta span{padding:6px 16px;border-radius:100px;font-size:13px;background:#fff;color:#555;border:1px solid var(--border)}
+.hero-cards-scroll{flex:1 1 0;min-height:0;width:100%;max-width:920px;overflow-y:auto;padding:4px 4px 8px;scrollbar-width:thin;scrollbar-color:transparent transparent}
+.hero-cards-scroll::-webkit-scrollbar{width:0}
+.hero-cards-scroll:hover::-webkit-scrollbar{width:4px}
+.hero-cards-scroll::-webkit-scrollbar-track{background:transparent}
+.hero-cards-scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:2px}
+.hero-cards-scroll:hover::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
+.hl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.hl-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-card);padding:22px 18px;display:flex;flex-direction:column;text-align:left;transition:box-shadow .2s,transform .2s}
+.hl-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.05);transform:translateY(-2px)}
+.hl-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;margin-bottom:12px}
+.hl-icon svg{width:20px;height:20px}
+.hl-card h3{font-size:15px;font-weight:600;color:#111;margin-bottom:6px}
+.hl-card-desc{font-size:12px;color:var(--muted);line-height:1.55;flex:1}
+.hl-card-desc p{margin:0;font-size:inherit;color:inherit}
+.hl-card-desc code{font-size:11px;color:#be185d;background:#fdf2f8;padding:1px 5px;border-radius:3px}
+.hl-icon.loop{background:var(--brand-light);color:var(--brand)}
+.hl-icon.sse{background:var(--amber-bg);color:var(--amber-fg)}
+.hl-icon.knowledge{background:var(--purple-bg);color:var(--purple-fg)}
+.hl-icon.memory{background:var(--blue-bg);color:var(--blue-fg)}
+.hl-icon.human{background:var(--pink-bg);color:var(--pink-fg)}
+.hl-icon.evolve{background:var(--green-bg);color:var(--green-fg)}
+.hl-icon.document{background:var(--brand-light);color:var(--brand)}
+.hl-icon.chart{background:var(--amber-bg);color:var(--amber-fg)}
+.hl-icon.cube{background:var(--purple-bg);color:var(--purple-fg)}
+.hl-icon.module{background:var(--blue-bg);color:var(--blue-fg)}
+.hl-icon.import{background:var(--pink-bg);color:var(--pink-fg)}
+.hl-icon.clock{background:var(--green-bg);color:var(--green-fg)}
+.hero-hint{flex-shrink:0;margin-top:12px;font-size:12px;color:var(--muted)}
+.hero-hint svg{width:20px;height:20px;display:block;margin:6px auto 0}
+.hero-hint.animate{animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+.anim-in{opacity:0;transform:translateY(20px);transition:opacity .5s cubic-bezier(0.2,0,0,1),transform .5s cubic-bezier(0.2,0,0,1)}
+.anim-in.visible{opacity:1;transform:translateY(0)}
+
+/* Tab bar */
+.tab-bar{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:6px 0;background:transparent;transition:background .3s ease,box-shadow .3s ease}
+.tab-bar.visible{background:rgba(255,255,255,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.tab-bar.scrolled{background:rgba(255,255,255,1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04)}
+.tab-bar-inner{display:flex;gap:2px;padding:4px 0}
+.tab-btn{position:relative;padding:9px 18px;font-size:14px;font-weight:500;font-family:var(--font-body);color:var(--muted);background:transparent;border:0;border-radius:var(--radius-btn);white-space:nowrap;cursor:pointer;transition:color .2s,background .2s}
+.tab-btn:hover{color:#111;background:rgba(0,0,0,0.04)}
+.tab-btn.active{color:var(--brand);font-weight:600}
+.tab-btn.active::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:20px;height:3px;border-radius:2px;background:var(--brand)}
+
+/* Content */
+.container{max-width:1100px;margin:0 auto;padding:0 32px}
+.tab-content{display:none;padding:28px 0 40px;animation:fadeUp .25s ease;min-height:calc(100vh - 200px)}
+.tab-content.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.md-view{background:#fff;border:1px solid var(--border);border-radius:14px;padding:32px 36px;line-height:1.75;color:#374151;min-height:200px}
+.md-view h1{font-size:28px;font-weight:700;color:#111;margin:24px 0 12px;scroll-margin-top:70px}
+.md-view h2{font-size:22px;font-weight:600;color:#1f2937;margin:20px 0 10px;scroll-margin-top:70px}
+.md-view h3{font-size:17px;font-weight:600;color:#374151;margin:16px 0 8px;scroll-margin-top:70px}
+.md-view p{margin:8px 0}
+.md-view code{font-size:13px;color:#be185d;background:#fdf2f8;padding:2px 6px;border-radius:4px;font-family:var(--font-mono)}
+.md-view pre{background:#1e293b;color:#e2e8f0;padding:16px 20px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.6;margin:12px 0}
+.md-view pre code{color:inherit;background:none;padding:0;font-size:inherit}
+.md-view blockquote{border-left:3px solid var(--brand);padding:8px 16px;margin:12px 0;background:var(--brand-light);border-radius:0 6px 6px 0;color:#555}
+.md-view table{border-collapse:collapse;width:100%;margin:12px 0}
+.md-view th{font-size:13px;font-weight:600;text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);background:var(--lighter-bg)}
+.md-view td{font-size:13px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.md-view hr{border:0;border-top:1px solid var(--border);margin:20px 0}
+.md-view a{color:var(--brand)}
+.md-view img{max-width:100%;border-radius:8px}
+.md-view ul,.md-view ol{margin:8px 0;padding-left:24px}
+
+/* —— 评论模式（正文不挤压，⊕ 和标记点在右侧）—— */
+.comment-mode .md-view h1,
+.comment-mode .md-view h2,
+.comment-mode .md-view h3,
+.comment-mode .md-view p,
+.comment-mode .sec-title{position:relative}
+.comment-mode .md-view h1:hover,
+.comment-mode .md-view h2:hover,
+.comment-mode .md-view h3:hover,
+.comment-mode .md-view p:hover,
+.comment-mode .sec-title:hover{background:rgba(227,30,36,0.035);border-radius:6px;cursor:pointer}
+.comment-mode .md-view h1:hover::after,
+.comment-mode .md-view h2:hover::after,
+.comment-mode .md-view h3:hover::after,
+.comment-mode .md-view p:hover::after,
+.comment-mode .sec-title:hover::after{content:'⊕';position:absolute;right:-24px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--brand);opacity:0.6;pointer-events:none}
+/* 评论标记点 */
+.cm-dot{position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:var(--brand);cursor:pointer;z-index:1}
+
+/* TOC */
+.md-toc{position:fixed;z-index:90;left:max(20px,calc((100vw - 1100px)/2 - 200px));top:140px;width:185px;max-height:none;overflow:visible;display:none;background:transparent!important;border:none!important;box-shadow:none!important;border-radius:0!important;padding:0 6px 0 0;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.md-toc.visible{display:block}
+.md-toc::before{content:'目录';display:block;font-size:11px;text-transform:uppercase;color:#999;font-weight:600;margin-bottom:10px;letter-spacing:0.04em;font-family:var(--font-body)}
+.md-toc::after{display:none!important}
+.md-toc *{background:transparent!important}
+.toc-list{margin:0;padding:0;list-style:none}
+.toc-list-item{margin:0;padding:0}
+.toc-link{display:block;padding:5px 10px;border-radius:4px;font-size:12px;font-family:var(--font-body);color:var(--muted);text-decoration:none;line-height:1.55;transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px;background:transparent!important}
+.toc-link:hover{color:#111;background:transparent!important}
+.toc-link.is-active-link{color:var(--brand);font-weight:600;background:transparent!important}
+.toc-link.is-active-link::before{display:none!important}
+.toc-list-item.is-active-li>.toc-link{color:var(--brand);font-weight:600;background:transparent!important}
+.node-name--H1>.toc-link{font-size:13px;font-weight:600}
+.node-name--H2>.toc-link{padding-left:18px;font-size:12px}
+.node-name--H3>.toc-link{padding-left:30px;font-size:11px;color:#9ca3af}
+.node-name--H3>.toc-link.is-active-link{color:var(--brand)}
+
+/* Pages cards */
+.sec-title{font-family:var(--font-display);font-size:15px;font-weight:600;color:#111;margin:32px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;scroll-margin-top:70px}
+.sec-title:first-child{margin-top:0}
+.sec-dot{width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-card);padding:20px;cursor:pointer;transition:all .2s}
+.card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(227,30,36,0.06);transform:translateY(-2px)}
+.card-hd{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.card-ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.card-ic svg{width:20px;height:20px}
+.card-ic.chat{background:var(--blue-bg);color:var(--blue-fg)}
+.card-ic.admin{background:var(--amber-bg);color:var(--amber-fg)}
+.card-ic.kb{background:var(--purple-bg);color:var(--purple-fg)}
+.card-ic.agent{background:var(--green-bg);color:var(--green-fg)}
+.card-ic.ws{background:var(--pink-bg);color:var(--pink-fg)}
+.card h3{font-family:var(--font-display);font-size:17px;font-weight:600}
+.card p{font-size:13px;color:var(--muted);line-height:1.5}
+.card-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.card-tag{padding:2px 8px;border-radius:var(--radius-tag);font-size:10px;font-weight:550;background:var(--brand-light);color:var(--brand)}
+
+/* Footer / Comment */
+.footer{text-align:center;padding:32px 20px 48px;color:var(--muted);font-size:12px}
+.cm-btn{position:fixed;bottom:28px;right:28px;z-index:200;width:48px;height:48px;border-radius:50%;background:var(--brand);color:#fff;border:0;box-shadow:0 4px 16px rgba(227,30,36,0.3);cursor:pointer;display:grid;place-items:center;transition:transform .2s,background .2s}
+.cm-btn:hover{transform:scale(1.08);background:var(--brand-dark)}
+.cm-btn svg{width:22px;height:22px}
+.cm-btn .badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#111;color:#fff;font-size:10px;font-weight:600;display:grid;place-items:center}
+.comment-sidebar{position:fixed;top:0;right:0;z-index:250;width:380px;height:100vh;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,0.08);transform:translateX(100%);transition:transform .3s cubic-bezier(0.2,0,0,1);display:flex;flex-direction:column}
+.comment-sidebar.open{transform:translateX(0)}
+.cm-sb-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.cm-sb-header h3{font-size:16px;font-weight:600}
+.cm-sb-close{width:32px;height:32px;border-radius:50%;border:0;background:var(--light-bg);cursor:pointer;font-size:16px;color:var(--muted);display:grid;place-items:center}
+.cm-sb-close:hover{background:var(--border)}
+.cm-sb-list{flex:1;overflow-y:auto;padding:12px 16px}
+.cm-sb-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.cm-card{background:var(--lighter-bg);border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:border-color .15s}
+.cm-card:hover{border-color:#d0d5dd}
+.cm-card.highlight{border-color:var(--brand)!important;box-shadow:0 0 0 1px var(--brand-light)}
+.cm-card-heading{font-size:11px;color:var(--brand);font-weight:550;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.cm-card-body{font-size:13px;line-height:1.6;color:#374151}
+.cm-card-body p{margin:4px 0}
+.cm-card-body img{max-width:100%;border-radius:6px;margin-top:6px}
+.cm-card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted)}
+.cm-card-actions button{background:none;border:0;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:3px}
+.cm-card-actions button:hover{color:var(--brand);background:var(--brand-light)}
+/* 评论表单（侧边栏内） */
+.cm-form-wrap{display:none;padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--lighter-bg)}
+.cm-form-wrap textarea{width:100%;min-height:70px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font-body);font-size:13px;resize:vertical;line-height:1.6}
+.cm-form-wrap textarea:focus{outline:none;border-color:var(--brand)}
+.cm-form-target{font-size:12px;color:var(--brand);margin-bottom:6px;font-weight:500}
+.cm-form-img-preview{position:relative;margin-top:6px}
+.cm-form-img-preview img{max-width:100%;border-radius:6px}
+.cm-form-img-remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:10px;cursor:pointer;display:grid;place-items:center}
+.cm-form-actions{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cm-form-upload{font-size:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px}
+.cm-form-upload:hover{color:var(--brand)}
+.cm-form-btns{display:flex;gap:6px}
+.cm-form-btns button{padding:6px 16px;border-radius:var(--radius-btn);font-size:13px;font-weight:550;cursor:pointer;border:0}
+.cm-form-submit{background:var(--brand);color:#fff}
+.cm-form-cancel{background:var(--light-bg);color:var(--fg)}
+
+/* Responsive */
+@media(max-width:1200px){.md-toc{display:none!important}}
+@media(max-width:768px){
+  .hero h1{font-size:36px}.hl-grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.container{padding:0 20px}
+  .tab-bar-inner{overflow-x:auto;-webkit-overflow-scrolling:touch}.tab-btn{padding:8px 14px;font-size:13px}.md-view{padding:20px 20px}
+  .cm-btn{bottom:20px;right:20px}.comment-sidebar{width:min(100%,360px)}
+}
+@media(prefers-reduced-motion:reduce){.anim-in{transition:none;opacity:1;transform:none}.hero-hint.animate{animation:none}.tab-content{animation:none}}
+#cm-image-input{display:none}
+</style>
+</head>
+<body>
+
+<section class="hero" id="hero">
+  <div class="hero-logo" id="hero-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
+  </div>
+  <h1 id="page-title"></h1>
+  <p class="hero-sub" id="page-subtitle"></p>
+  <div class="meta" id="page-meta"></div>
+  <div class="hero-cards-scroll"><div class="hl-grid" id="hl-grid"></div></div>
+  <div class="hero-hint animate">向下滚动查看详细介绍<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg></div>
+</section>
+
+<nav class="tab-bar" id="tab-bar"><div class="tab-bar-inner" id="tab-bar-inner"></div></nav>
+<div class="container" id="tab-container"></div>
+<footer class="footer" id="page-footer"></footer>
+
+<button class="cm-btn" id="cm-btn" onclick="App.toggleComment()" title="评论">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="badge" id="cm-badge" style="display:none">0</span>
+</button>
+
+<div class="comment-sidebar" id="cm-sidebar">
+  <div class="cm-sb-header"><h3>评论</h3><button class="cm-sb-close" onclick="App.toggleComment()">✕</button></div>
+  <div class="cm-sb-list" id="cm-list"></div>
+  <div class="cm-form-wrap" id="cm-form-wrap">
+    <div id="cm-form-target" class="cm-form-target"></div>
+    <textarea id="cm-textarea" placeholder="输入评论（支持 Markdown）..."></textarea>
+    <div id="cm-img-preview"></div>
+    <div class="cm-form-actions">
+      <span class="cm-form-upload" onclick="document.getElementById('cm-image-input').click()">📷 上传图片</span>
+      <div class="cm-form-btns">
+        <button class="cm-form-cancel" onclick="App.cancelComment()">取消</button>
+        <button class="cm-form-submit" id="cm-submit-btn" onclick="App.submitComment()">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="md-toc" id="md-toc"></nav>
+<input type="file" id="cm-image-input" accept="image/*" onchange="App.onCommentImage(event)">
+
+<script>
+const App = (function() {
+  'use strict';
+  const STORAGE_KEY = 'prd_comments';
+
+  const DEFAULT_CONFIG = {
+    meta:{title:'产品需求介绍',subtitle:'',tags:[],logo:{type:'svg',value:''}},
+    brand:{primary:'#E31E24',light:'#FDEBEC',dark:'#B3151A'},
+    fonts:{display:'Playfair Display',body:'Inter',mono:'JetBrains Mono'},
+    tabs:{folder:'tabs',files:[],extra:[]},cards:[],footer:{text:''}
+  };
+
+  const CARD_ICONS = {
+    loop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    sse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    knowledge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+    memory:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>',
+    human:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    evolve:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+    document:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    cube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+    module:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>',
+    import:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  };
+
+  let config=null,allTabs=[],pendingImage=null;
+  let state={currentTab:null,content:{},commentMode:false,editingComment:null};
+
+  /* ---- Init ---- */
+  async function init() {
+    await loadConfig();applyBrand();renderHero();buildTabs();renderTabBar();renderTabSections();
+    if(allTabs.length>0)activateTab(allTabs[0].id);
+    document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+    window.addEventListener('scroll',onScroll,{passive:true});
+    allTabs.forEach(t=>loadContent(t.id,t.file,t.type));
+    setupAnimations();
+    mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
+    updateBadge();
+  }
+  async function loadConfig(){try{const r=await fetch('config.json');if(r.ok){config=deepMerge(DEFAULT_CONFIG,await r.json());return;}}catch(e){}config=JSON.parse(JSON.stringify(DEFAULT_CONFIG));}
+  function deepMerge(b,o){const r=JSON.parse(JSON.stringify(b));for(const k in o){if(o[k]&&typeof o[k]==='object'&&!Array.isArray(o[k]))r[k]=deepMerge(b[k]||{},o[k]);else r[k]=o[k];}return r;}
+  function applyBrand(){const s=document.documentElement.style;s.setProperty('--brand',config.brand.primary);s.setProperty('--brand-light',config.brand.light);s.setProperty('--brand-dark',config.brand.dark);}
+  function buildTabs(){allTabs=[];const tc=config.tabs||{};(tc.files||[]).forEach(fp=>{const p=fp.replace(/\\/g,'/').split('/'),fn=p[p.length-1],id=fn.replace(/\.(md|txt)$/,'');allTabs.push({id,label:id.charAt(0).toUpperCase()+id.slice(1),file:fp,type:'markdown'});});(tc.extra||[]).forEach(t=>allTabs.push({id:t.id,label:t.label,file:t.file,type:t.type||'markdown'}));if(!allTabs.length)allTabs.push({id:'default',label:'内容',file:'content.md',type:'markdown'});}
+
+  function renderHero(){
+    document.getElementById('page-title').textContent=config.meta.title;document.getElementById('html-title').textContent=config.meta.title;
+    document.getElementById('page-subtitle').textContent=config.meta.subtitle;
+    document.getElementById('page-meta').innerHTML=config.meta.tags.map(t=>`<span>${esc(t)}</span>`).join('');
+    const ld=document.getElementById('hero-logo');if(config.meta.logo&&config.meta.logo.value){if(config.meta.logo.type==='image')ld.innerHTML=`<img src="${config.meta.logo.value}" alt="logo">`;else ld.innerHTML=config.meta.logo.value;}
+    const g=document.getElementById('hl-grid');g.innerHTML='';
+    config.cards.forEach(c=>{const e=document.createElement('div');e.className='hl-card anim-in';e.innerHTML=`<div class="hl-icon ${c.icon}">${CARD_ICONS[c.icon]||CARD_ICONS.document}</div><h3>${esc(c.title)}</h3><div class="hl-card-desc">${marked.parse(c.description||'')}</div>`;g.appendChild(e);});
+    document.getElementById('page-footer').innerHTML=`&copy; ${new Date().getFullYear()} · <a href="/manager/" style="color:inherit;text-decoration:none;cursor:pointer" title="管理后台">${esc(config.footer.text)}</a>`;
+  }
+  function setupAnimations(){if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;const o=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');o.unobserve(e.target);}});},{threshold:0.15});document.querySelectorAll('.anim-in').forEach((el,i)=>{el.style.transitionDelay=(i*0.06)+'s';o.observe(el);});}
+
+  /* ---- Scroll ---- */
+  let tabBarOffsetTop=0,tocActiveTimer=null;
+  function getScrollOffset(){const bar=document.getElementById('tab-bar');const h=bar?Math.ceil(bar.getBoundingClientRect().height):0;return h+20;}
+  function onScroll(){const bar=document.getElementById('tab-bar'),heroH=window.innerHeight;if(!tabBarOffsetTop)tabBarOffsetTop=bar.offsetTop;bar.classList.toggle('visible',window.scrollY>heroH*0.5);bar.classList.toggle('scrolled',window.scrollY>tabBarOffsetTop-10);updateTocVisibility();requestAnimationFrame(updateActiveToc);clearTimeout(tocActiveTimer);tocActiveTimer=setTimeout(updateActiveToc,90);}
+
+  /* ---- Tab ---- */
+  function renderTabBar(){document.getElementById('tab-bar-inner').innerHTML=allTabs.map(t=>`<button class="tab-btn" data-tab="${t.id}">${esc(t.label)}</button>`).join('');}
+  function renderTabSections(){const c=document.getElementById('tab-container');c.innerHTML=allTabs.map(t=>t.type==='pages'?`<section class="tab-content" id="tab-${t.id}"><div id="view-${t.id}"></div></section>`:`<section class="tab-content" id="tab-${t.id}"><div class="md-view" id="view-${t.id}"></div></section>`).join('');}
+  function activateTab(tabId){state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');}
+
+  function isPreviewFresh(){const host=window.location.hostname;return host==='127.0.0.1'||host==='localhost'||new URLSearchParams(window.location.search).has('fresh');}
+  function withCacheBust(file){if(!isPreviewFresh())return file;return file+(file.includes('?')?'&':'?')+'v='+Date.now();}
+  async function loadContent(tabId,file,type){const sk='md_'+tabId;if(type==='markdown'){const c=localStorage.getItem(sk);if(c&&c.trim()&&!isPreviewFresh()){state.content[tabId]=c;renderTab(tabId,type);return;}}try{const r=await fetch(withCacheBust(file),{cache:isPreviewFresh()?'no-store':'default'});if(r.ok){const t=await r.text();state.content[tabId]=t;if(type==='markdown'&&!isPreviewFresh())localStorage.setItem(sk,t);renderTab(tabId,type);}else showEmpty(tabId,file);}catch(e){showEmpty(tabId,file);}}
+  function showEmpty(tabId,file){const v=document.getElementById('view-'+tabId);if(!v)return;v.innerHTML=`<div class="md-empty"><p>暂无内容 — 未找到 <code>${esc(file)}</code></p></div>`;}
+  function renderTab(tabId,type){const c=state.content[tabId];if(c===undefined)return;if(type==='markdown')renderMarkdown(tabId,c);else if(type==='pages')renderPages(tabId,c);}
+
+  async function renderMarkdown(tabId,md){const v=document.getElementById('view-'+tabId);if(!v)return;v.innerHTML=marked.parse(md);await mermaidBlocks(v);if(state.currentTab===tabId){initTocbot(tabId);attachCommentHandlers();renderCommentMarkers(tabId);}}
+  async function mermaidBlocks(c){const bs=c.querySelectorAll('pre code.language-mermaid');for(let i=0;i<bs.length;i++){const code=bs[i],pre=code.parentElement;try{const{svg}=await mermaid.render('mmd-'+Date.now()+'-'+i,code.textContent);const d=document.createElement('div');d.innerHTML=svg;d.style.cssText='text-align:center;margin:16px 0;';pre.replaceWith(d);}catch(e){}}}
+
+  function renderPages(tabId,jsonStr){const v=document.getElementById('view-'+tabId);if(!v)return;let data;try{data=JSON.parse(jsonStr);}catch(e){v.innerHTML='<div class="md-empty"><p>JSON 解析失败</p></div>';return;}let h='';(data.sections||[]).forEach((s,i)=>{h+=`<div class="sec-title" id="pg-sec-${i}"><span class="sec-dot"></span>${esc(s.title)}</div><div class="cards">`;(s.cards||[]).forEach(c=>h+=renderCardHTML(c));h+='</div>';});v.innerHTML=h;v.querySelectorAll('.card[data-link]').forEach(card=>{card.addEventListener('click',()=>{const l=card.dataset.link;if(l)window.open(l,'_blank');});card.setAttribute('tabindex','0');card.setAttribute('role','button');});if(state.currentTab===tabId){initTocbot(tabId,'.sec-title');renderCommentMarkers(tabId);}}
+  function renderCardHTML(card){const ics={chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',admin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',kb:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',agent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',ws:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'};const svg=ics[card.iconType]||ics.chat;let tags='';(card.tags||[]).forEach(t=>{tags+=`<span class="card-tag">${esc(t)}</span>`;});return `<div class="card" data-link="${esc(card.link||'')}"><div class="card-hd"><div class="card-ic ${card.iconType||'chat'}">${svg}</div><h3>${esc(card.title)}</h3></div><p>${esc(card.description||'')}</p><div class="card-tags">${tags}</div></div>`;}
+
+  /* ---- TOC (tocbot) ---- */
+  function initTocbot(tabId,headingSelector){tocbot.destroy();document.querySelectorAll('.js-toc-content').forEach(el=>el.classList.remove('js-toc-content'));const sel=headingSelector||'h1, h2, h3';const ce=document.querySelector(`#tab-${tabId} .md-view`)||document.getElementById('view-'+tabId);if(!ce)return;ce.classList.add('js-toc-content');ce.querySelectorAll(sel).forEach((el,i)=>{el.id=`${tabId}-h-${i}`;});tocbot.init({tocSelector:'#md-toc',contentSelector:`#tab-${tabId} .js-toc-content`,headingSelector:sel,headingsOffset:getScrollOffset(),scrollSmoothOffset:-getScrollOffset(),scrollSmooth:true,collapseDepth:6,activeLinkClass:'is-active-link',disableTocScrollSync:true});requestAnimationFrame(()=>{tocbot.refresh();updateActiveToc();});updateTocVisibility();}
+  function updateTocVisibility(){const toc=document.getElementById('md-toc');const stuck=document.getElementById('tab-bar').classList.contains('scrolled');const hasContent=toc.querySelector('.toc-link')!==null;toc.style.setProperty('--toc-top',getScrollOffset()+20+'px');toc.classList.toggle('visible',stuck&&hasContent);}
+  function updateActiveToc(){const toc=document.getElementById('md-toc');if(!toc)return;const headings=[...document.querySelectorAll('.tab-content.active .js-toc-content h1,.tab-content.active .js-toc-content h2,.tab-content.active .js-toc-content h3,.tab-content.active .js-toc-content .sec-title')];if(!headings.length)return;const readingLine=getScrollOffset()+90;let active=headings[0];headings.forEach(h=>{if(h.getBoundingClientRect().top<=readingLine)active=h;});toc.querySelectorAll('.is-active-link').forEach(a=>a.classList.remove('is-active-link'));toc.querySelectorAll('.is-active-li').forEach(li=>li.classList.remove('is-active-li'));const link=toc.querySelector(`a[href="#${CSS.escape(active.id)}"]`);if(link){link.classList.add('is-active-link');link.closest('.toc-list-item')?.classList.add('is-active-li');}}
+
+  function switchTab(tabId){if(state.currentTab===tabId)return;closeCommentForm();state.currentTab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));const sec=document.getElementById('tab-'+tabId);if(sec)sec.classList.add('active');const t=allTabs.find(x=>x.id===tabId);if(t&&state.content[tabId]!==undefined)renderTab(tabId,t.type);else if(t)loadContent(tabId,t.file,t.type);renderCommentList();updateBadge();scrollToTabTop();}
+
+  function scrollToTabTop(){const bar=document.getElementById('tab-bar');if(bar){const top=bar.offsetTop;window.scrollTo({top:top,behavior:'auto'});}}
+
+  /* ---- Comment: 存储 ---- */
+  function loadComments(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY+'_'+state.currentTab)||'[]');}catch(e){return[];}}
+  function saveComments(arr){localStorage.setItem(STORAGE_KEY+'_'+state.currentTab,JSON.stringify(arr));}
+
+  /* ---- Comment: 模式切换 ---- */
+  function toggleComment(){state.commentMode=!state.commentMode;document.body.classList.toggle('comment-mode',state.commentMode);const sb=document.getElementById('cm-sidebar');if(state.commentMode){sb.classList.add('open');renderCommentList();attachCommentHandlers();}else{sb.classList.remove('open');closeCommentForm();}updateBadge();}
+
+  /* ---- Comment: 段落点击 ---- */
+  function attachCommentHandlers(){if(!state.commentMode)return;const view=document.querySelector('.tab-content.active .md-view');if(!view||view.dataset.cmOn)return;view.dataset.cmOn='1';view.addEventListener('click',function(e){const el=e.target.closest('h1,h2,h3,p,li,pre,blockquote,.mermaid-rendered');if(!el||e.target.closest('a,button,table,.cm-dot'))return;e.stopPropagation();startComment(el);});document.querySelector('.tab-content.active')?.addEventListener('click',function(e){const el=e.target.closest('.sec-title');if(!el)return;startComment(el);});}
+
+  function startComment(el){if(!state.commentMode||state.editingComment)return;let id=el.id;if(!id){id='h-'+Math.random().toString(36).slice(2,8);el.id=id;}const targetText=el.textContent.substring(0,60);state.editingComment={headingId:id,headingText:targetText,content:'',image:'',isNew:true};showCommentForm(targetText);}
+
+  /* ---- Comment: 表单 ---- */
+  function showCommentForm(targetText){const wrap=document.getElementById('cm-form-wrap');wrap.style.display='block';document.getElementById('cm-form-target').textContent='📍 '+esc(targetText||'');document.getElementById('cm-textarea').value='';document.getElementById('cm-img-preview').innerHTML='';document.getElementById('cm-submit-btn').textContent='提交';pendingImage=null;document.getElementById('cm-textarea').focus();}
+
+  function submitComment(){const ta=document.getElementById('cm-textarea');const content=(ta?ta.value:'').trim();if(!content&&!pendingImage)return;const comments=loadComments();const ec=state.editingComment;if(!ec)return;if(ec.isNew){comments.push({id:'c_'+Date.now(),tabId:state.currentTab,headingId:ec.headingId||'',headingText:ec.headingText||'',content,image:pendingImage||'',time:new Date().toISOString(),edited:false});}else{const idx=comments.findIndex(c=>c.id===ec.id);if(idx>=0){comments[idx].content=content;comments[idx].image=pendingImage!==null?pendingImage:ec.image||'';comments[idx].edited=true;}}saveComments(comments);closeCommentForm();renderCommentList();renderCommentMarkers(state.currentTab);updateBadge();}
+
+  function closeCommentForm(){state.editingComment=null;pendingImage=null;document.getElementById('cm-form-wrap').style.display='none';document.getElementById('cm-textarea').value='';document.getElementById('cm-img-preview').innerHTML='';}
+
+  function editComment(commentId){const comments=loadComments();const c=comments.find(x=>x.id===commentId);if(!c)return;state.editingComment={...c,isNew:false};pendingImage=c.image||null;document.getElementById('cm-form-wrap').style.display='block';document.getElementById('cm-form-target').textContent='📍 '+esc(c.headingText||'');document.getElementById('cm-textarea').value=c.content;document.getElementById('cm-submit-btn').textContent='保存修改';if(c.image)showImgPreview(c.image);document.getElementById('cm-textarea').focus();}
+
+  function deleteComment(commentId){let comments=loadComments();comments=comments.filter(c=>c.id!==commentId);saveComments(comments);closeCommentForm();renderCommentList();renderCommentMarkers(state.currentTab);updateBadge();}
+
+  /* ---- Comment: 图片 ---- */
+  function onCommentImage(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(ev){pendingImage=ev.target.result;showImgPreview(ev.target.result);};reader.readAsDataURL(file);e.target.value='';}
+  function showImgPreview(dataUri){document.getElementById('cm-img-preview').innerHTML=`<div class="cm-form-img-preview"><img src="${dataUri}"><button class="cm-form-img-remove" onclick="App.removeImg()">✕</button></div>`;}
+  function removeImg(){pendingImage=null;document.getElementById('cm-img-preview').innerHTML='';}
+
+  /* ---- Comment: 标记点 ---- */
+  function renderCommentMarkers(tabId){const view=document.querySelector('.tab-content.active .md-view');if(!view)return;view.querySelectorAll('.cm-dot').forEach(d=>d.remove());const comments=loadComments();comments.forEach(c=>{if(!c.headingId)return;const el=document.getElementById(c.headingId);if(!el)return;const dot=document.createElement('span');dot.className='cm-dot';dot.title=c.content.substring(0,60);dot.addEventListener('click',(e)=>{e.stopPropagation();scrollToHeading(c.headingId);highlightCommentCard(c.id);});el.appendChild(dot);});}
+
+  function scrollToHeading(headingId){const el=document.getElementById(headingId);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-getScrollOffset(),behavior:'smooth'});}
+
+  /* ---- Comment: 列表 ---- */
+  function renderCommentList(){const list=document.getElementById('cm-list');const comments=loadComments();if(!comments.length){list.innerHTML='<div class="cm-sb-empty">暂无评论<br>开启评论模式后点击正文段落添加</div>';return;}list.innerHTML=comments.map(c=>`<div class="cm-card" id="cm-card-${c.id}" onclick="App.clickComment('${c.id}')"><div class="cm-card-heading" onclick="event.stopPropagation();App.scrollToHeading('${c.headingId}')">${c.headingText?'📍 '+esc(c.headingText):''}</div><div class="cm-card-body">${marked.parse(c.content||'')}${c.image?`<img src="${c.image}" alt="">`:''}</div><div class="cm-card-meta"><span>${new Date(c.time).toLocaleString('zh-CN')}${c.edited?' (已编辑)':''}</span><div class="cm-card-actions"><button onclick="event.stopPropagation();App.editComment('${c.id}')">编辑</button><button onclick="event.stopPropagation();App.deleteComment('${c.id}')">删除</button></div></div></div>`).join('');}
+
+  function clickComment(commentId){document.querySelectorAll('.cm-card').forEach(card=>card.classList.remove('highlight'));const card=document.getElementById('cm-card-'+commentId);if(card)card.classList.add('highlight');const comments=loadComments();const c=comments.find(x=>x.id===commentId);if(c&&c.headingId)scrollToHeading(c.headingId);}
+
+  function highlightCommentCard(commentId){document.querySelectorAll('.cm-card').forEach(card=>card.classList.remove('highlight'));const card=document.getElementById('cm-card-'+commentId);if(card)card.classList.add('highlight');}
+
+  function updateBadge(){const badge=document.getElementById('cm-badge');const comments=loadComments();if(comments.length>0){badge.style.display='grid';badge.textContent=comments.length>99?'99+':comments.length;}else badge.style.display='none';}
+
+  function cancelComment(){closeCommentForm();}
+
+  function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+  return {init,switchTab,toggleComment,startComment,submitComment,cancelComment,editComment,deleteComment,clickComment,scrollToHeading,onCommentImage,removeImg,updateBadge};
+})();
+document.addEventListener('DOMContentLoaded',()=>App.init());
+</script>
+</body>
+</html>
