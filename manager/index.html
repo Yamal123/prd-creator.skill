@@ -282,7 +282,8 @@ function addCard() { config.cards.push({icon:'document',title:'新功能',descri
 // 内容编辑
 async function loadContentList() {
   const sel = document.getElementById('content-file'); sel.innerHTML = '<option value="">-- 选择文件 --</option>';
-  const files = [...(config.tabs.files||[]), ...(config.tabs.extra||[]).map(t=>t.file)];
+  const flat = (arr) => (arr||[]).map(x => typeof x === 'string' ? x : (x.file || x));
+  const files = [...flat(config.tabs.files), ...(config.tabs.extra||[]).map(t=>t.file)];
   files.forEach(f => { sel.innerHTML += `<option value="${f}">${f}</option>`; });
 }
 
