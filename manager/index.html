@@ -186,11 +186,13 @@ textarea.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
 
 <script>
 let config = {};
+// 自动检测 API 前缀：/prd/manager/ → /prd，/manager/ → 空
+var BASE = window.location.pathname.replace(/\/manager\/?.*$/, '');
 
 async function api(method, path, body) {
   const opts = {method, headers:{}};
   if (body !== undefined) { opts.headers['Content-Type'] = body && typeof body === 'object' ? 'application/json' : 'text/plain'; opts.body = typeof body === 'object' ? JSON.stringify(body) : body; }
-  const r = await fetch('/api' + path, opts);
+  const r = await fetch(BASE + '/api' + path, opts);
   if (method === 'DELETE' || (method === 'POST' && (path.startsWith('/content') || path === '/config'))) return r.ok;
   return r.ok ? r.json() : null;
 }
@@ -205,7 +207,7 @@ function toast(msg, type) {
 
 async function loadConfig() {
   try {
-    const r = await fetch('/api/config');
+    const r = await fetch(BASE + '/api/config');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     config = await r.json() || {};
     if (!config || typeof config !== 'object') throw new Error('Invalid');
@@ -286,18 +288,18 @@ async function loadContentList() {
 
 async function loadContent() {
   const f = document.getElementById('content-file').value; if (!f) return;
-  const r = await fetch('/api/content?file=' + encodeURIComponent(f));
+  const r = await fetch(BASE + '/api/content?file=' + encodeURIComponent(f));
   if (r.ok) { const d = await r.json(); document.getElementById('content-editor').value = d.content; setStatus('已加载 ' + f); }
 }
 
 async function saveContent() {
   const f = document.getElementById('content-file').value; if (!f) return;
-  await fetch('/api/content?file=' + encodeURIComponent(f), {method:'POST',body:document.getElementById('content-editor').value});
+  await fetch(BASE + '/api/content?file=' + encodeURIComponent(f), {method:'POST',body:document.getElementById('content-editor').value});
   setStatus('已保存 ' + f); toast('已保存 ' + f);
 }
 
 async function scanTabs() {
-  const r = await fetch('/api/scan?folder=tabs');
+  const r = await fetch(BASE + '/api/scan?folder=tabs');
   if (r.ok) { const d = await r.json(); config.tabs.files = d.files || []; }
   const n = (config.tabs.files||[]).length + (config.tabs.extra||[]).length;
   document.getElementById('tab-count').textContent = `共 ${n} 个 Tab`;
@@ -307,7 +309,7 @@ async function scanTabs() {
 async function newContent() {
   const name = prompt('文件名（含后缀）:', 'new.md'); if (!name) return;
   const path = 'tabs/' + name;
-  await fetch('/api/content?file=' + encodeURIComponent(path), {method:'POST',body:'# ' + name.replace('.md','') + '\n\n'});
+  await fetch(BASE + '/api/content?file=' + encodeURIComponent(path), {method:'POST',body:'# ' + name.replace('.md','') + '\n\n'});
   config.tabs.files.push(path);
   loadContentList(); document.getElementById('content-file').value = path; loadContent();
   toast('已创建 ' + path);
@@ -317,7 +319,7 @@ function uploadContent() { document.getElementById('content-upload').click(); }
 async function onContentUpload(e) {
   const file = e.target.files[0]; if (!file) return;
   const path = 'tabs/' + file.name;
-  await fetch('/api/content?file=' + encodeURIComponent(path), {method:'POST',body:await file.text()});
+  await fetch(BASE + '/api/content?file=' + encodeURIComponent(path), {method:'POST',body:await file.text()});
   if (!config.tabs.files.includes(path)) config.tabs.files.push(path);
   loadContentList(); document.getElementById('content-file').value = path; loadContent();
   toast('已上传 ' + path); e.target.value = '';
@@ -326,7 +328,7 @@ async function onContentUpload(e) {
 async function deleteContent() {
   const f = document.getElementById('content-file').value; if (!f) return;
   if (!confirm('确认删除 ' + f + '？此操作不可逆。')) return;
-  await fetch('/api/delete?file=' + encodeURIComponent(f));
+  await fetch(BASE + '/api/delete?file=' + encodeURIComponent(f));
   config.tabs.files = config.tabs.files.filter(x => x !== f);
   loadContentList(); document.getElementById('content-editor').value = '';
   setStatus('已删除 ' + f); toast('已删除 ' + f, 'error');
@@ -336,7 +338,7 @@ async function renameContent() {
   const oldF = document.getElementById('content-file').value;
   const newName = document.getElementById('rename-input').value; if (!oldF || !newName) return;
   const newF = 'tabs/' + newName;
-  await fetch('/api/rename', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old:oldF,new:newF})});
+  await fetch(BASE + '/api/rename', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old:oldF,new:newF})});
   const idx = config.tabs.files.indexOf(oldF); if (idx >= 0) config.tabs.files[idx] = newF;
   loadContentList(); document.getElementById('content-file').value = newF;
   document.getElementById('rename-input').value = ''; toast('已重命名: ' + newF);
