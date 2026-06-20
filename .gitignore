@@ -2,3 +2,10 @@ __pycache__/
 .DS_Store
 *.pyc
 .prd/
+manager/app.py
+manager/main.py
+manager/data.py
+manager/preview_window.py
+manager/requirements.txt
+manager/ui/
+tests/
