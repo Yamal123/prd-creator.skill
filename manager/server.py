@@ -10,8 +10,8 @@ import os
 import urllib.parse
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # 项目根目录
-PRD_ROOT = PROJECT_ROOT / "prd"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PRD_ROOT = PROJECT_ROOT / "prd" if (PROJECT_ROOT / "prd").exists() else PROJECT_ROOT
 PORT = 18900
 
 
