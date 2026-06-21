@@ -1,0 +1,4 @@
+interface:
+  display_name: "PRD Creator"
+  short_description: "Create and maintain project PRD websites"
+  default_prompt: "Use $prd-creator to create or update a PRD website for this project."
