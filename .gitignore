@@ -8,4 +8,3 @@ manager/data.py
 manager/preview_window.py
 manager/requirements.txt
 manager/ui/
-tests/
